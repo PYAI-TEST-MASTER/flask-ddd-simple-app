@@ -163,7 +163,7 @@ def upload_file():
                 # vgg16_drowsiness_level = get_drowsiness_level(vgg16_count,len(files))
                 vgg16_normal_drowsiness_level = get_drowsiness_level(vgg16_normal_count,len(files))
             # VGG16_RESULT =                  "転移学習VGG16(非正規)：クローズ数／枚数　"+ str(vgg16_count)+"/"+ str(len(files))+"   " + vgg16_drowsiness_level +vgg16_status[:20]
-            VGG16_NORMAL_RESULT =           "■転移学習VGG16(正規化)  ：クローズ数／枚数　"+ str(vgg16_normal_count)+"/"+ str(len(files))+"   ★判定結果："+ vgg16_normal_drowsiness_level+"　　下記は各画像の判定結果(O:OPEN_EYE/C:CLOSE_EYE)"
+            VGG16_NORMAL_RESULT =           "■転移学習VGG16(正規化)  ：瞼クローズ数／全体枚数　"+ str(vgg16_normal_count)+"/"+ str(len(files))+"   ★判定結果："+ vgg16_normal_drowsiness_level+"　　下記は各画像の判定結果(O:OPEN_EYE/C:CLOSE_EYE)"
 
 #        return render_template("index.html",answer=VGG16_RESULT,answer2 = VGG16_NORMAL_RESULT) 
         return render_template("index.html",answer = VGG16_NORMAL_RESULT ,answer2 = vgg16_normal_status) 
