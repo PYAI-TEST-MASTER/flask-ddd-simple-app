@@ -49,14 +49,14 @@ def upload_file():
             def get_drowsiness_level(close_count ,totalcount):
                 persent = close_count / totalcount * 100
                 if persent >= 98:
-                    return '居眠り'
+                    return '居眠り（超危険）'
                 if persent >= 75:
-                    return 'かなり眠たい'
+                    return 'かなり眠たい（かなり危険）'
                 if persent >= 25:
-                    return '眠たい'
+                    return '眠たい（危険）'
                 if persent >= 5:
-                    return 'やや眠たい'
-                return '覚醒'            
+                    return 'やや眠たい（やや危険）'
+                return '覚醒（安全）'            
             # ここでファイルを処理する
             # 例: ファイルを保存する、画像解析を行うなど
             print(file)
@@ -67,8 +67,7 @@ def upload_file():
             os.remove(filepath)
             eye = cascade.detectMultiScale(face)
  
-            #顔の座標を表示する
-
+            # 目と眉毛の区画を切り出す（目が切り出されなかった瞼が閉じていると判断する
             if eye is None:
                 print('CLOSE1_EYE')
                 skip_flag = 1
@@ -78,20 +77,11 @@ def upload_file():
             except IndexError:
                 print('CLOSE2_EYE')
                 skip_flag = 1
+#           眉毛と目が切り出されている場合の処理
             if skip_flag == 0:      
-                # if eye[0] is None:
-                #     print(eye[1])
-                #     x,y,w,h = eye[1]
-                # else:
-                #     print(eye[0])
-                #     x,y,w,h = eye[0]
-                #顔部分を切り取る
-
                 eye_cut = face[y-h//3:y+h*10//8, x-w//3:x+w*10//8]
-    #            eye_cut = img[y:y+h, x:x+w]
-    #            eye_cut = img[y-w//2:y+w//2, x:x+w]
-                #白枠で顔を囲む
-    #            x,y,w,h = eye[0]
+                #眉毛と目を白枠で顔を囲む
+
                 cv2.rectangle(face,(x-w//2,y-h//2),(x+w*10//8,y+h*10//8),(255,255,255),2)
     
                 #cv2.rectangle(img,(x,y-w//2),(x+w,y+w//2),(255,255,255),2)
@@ -107,9 +97,7 @@ def upload_file():
                     cv2.imwrite(filepath, face)
                 #ヒストグラム平坦化
                 eye_cut_hist = cv2.equalizeHist(eye_cut)
-###1                cv2.imwrite(filepath, eye_cut_hist)        
                 img_rgb = cv2.cvtColor(eye_cut_hist, cv2.COLOR_BGR2RGB)   
-    #            img_rgb = cv2.cvtColor(eye_cut, cv2.COLOR_BGR2RGB)
                 img = cv2.resize(img_rgb, (82,82))
                 img = img.astype('float32') / 255
                 img = np.expand_dims(img, axis=0)
@@ -162,11 +150,11 @@ def upload_file():
                 vgg16_normal_status += 'C'
                 # vgg16_drowsiness_level = get_drowsiness_level(vgg16_count,len(files))
                 vgg16_normal_drowsiness_level = get_drowsiness_level(vgg16_normal_count,len(files))
-            # VGG16_RESULT =                  "転移学習VGG16(非正規)：クローズ数／枚数　"+ str(vgg16_count)+"/"+ str(len(files))+"   " + vgg16_drowsiness_level +vgg16_status[:20]
-            VGG16_NORMAL_RESULT =           "■転移学習VGG16(正規化)  ：瞼クローズ数／全体枚数　"+ str(vgg16_normal_count)+"/"+ str(len(files))+"   ★判定結果："+ vgg16_normal_drowsiness_level+"　　下記は各画像の判定結果(O:OPEN_EYE/C:CLOSE_EYE)"
+            # VGG16_RESULT =                  "転移学習VGG16(非正規)：瞼クローズ枚数／全体枚数　"+ str(vgg16_count)+"/"+ str(len(files))+"   " + vgg16_drowsiness_level +vgg16_status[:20]
+            VGG16_NORMAL_RESULT =           "■転移学習VGG16(正規化)  ：瞼クローズ枚数／全体枚数　"+ str(vgg16_normal_count)+"/"+ str(len(files))+"   ★判定結果："+ vgg16_normal_drowsiness_level
 
 #        return render_template("index.html",answer=VGG16_RESULT,answer2 = VGG16_NORMAL_RESULT) 
-        return render_template("index.html",answer = VGG16_NORMAL_RESULT ,answer2 = vgg16_normal_status) 
+        return render_template("index.html",answer = VGG16_NORMAL_RESULT ,answer2 ="下記は各画像の判定結果(O:OPEN_EYE/C:CLOSE_EYE)",answer3 = vgg16_normal_status) 
 
     return render_template("index.html",answer="")
 # if __name__ == "__main__":
